@@ -5,6 +5,7 @@ import postsAtom from "../atoms/postsAtom";
 import Post from "../components/Post";
 import SuggestedUsers from "../components/SuggestedUsers";
 import useShowToast from "../hooks/useShowToast";
+import { clearAuthData } from "../utils/clearAuthData";
 function HomePage() {
   const [posts, setPosts] = useRecoilState(postsAtom);
   const [loading, setLoading] = useState(true);
@@ -19,6 +20,12 @@ function HomePage() {
       setLoading(true);
       try {
         const res = await fetch(`/api/posts/feed?page=${page}`);
+        if (res.status === 401) {
+          clearAuthData();
+          // Redirect to login page
+          window.location.href = "/auth";
+          return;
+        }
         const data = await res.json();
 
         if (data.error) {
@@ -27,7 +34,12 @@ function HomePage() {
         }
 
         console.log("feed", data);
-        setPosts((prevPosts) => [...prevPosts, ...data.posts]);
+        // Ensure no duplicate posts
+        const uniquePosts = data.posts.filter(
+          (newPost) => !posts.some((post) => post._id === newPost._id)
+        );
+        setPosts((prevPosts) => [...prevPosts, ...uniquePosts]);
+
         setHasMore(data.hasMore);
       } catch (error) {
         showToast("Error", error, "error");
@@ -37,6 +49,10 @@ function HomePage() {
     },
     [showToast, setPosts]
   );
+
+  useEffect(() => {
+    getFeedPosts(page);
+  }, [getFeedPosts, page]);
 
   // useEffect(() => {
   //   const getFeedPosts = async () => {
@@ -61,9 +77,6 @@ function HomePage() {
   //   };
   //   getFeedPosts();
   // }, [showToast, setPosts]);
-  useEffect(() => {
-    getFeedPosts(page);
-  }, [getFeedPosts, page]);
 
   const handleScroll = useCallback(() => {
     if (
@@ -88,15 +101,16 @@ function HomePage() {
           {!loading && posts.length === 0 && (
             <h1>Follow some users to see the feed</h1>
           )}
-          {loading && (
+          {/* {loading && (
             <Flex justify="center">
               <Spinner size="xl" />
             </Flex>
-          )}
+          )} */}
 
-          {posts?.map((post) => (
-            <Post key={post._id} post={post} postedBy={post.postedBy} />
-          ))}
+          {Array.isArray(posts) &&
+            posts.map((post) => (
+              <Post key={post._id} post={post} postedBy={post.postedBy} />
+            ))}
           {loading && (
             <Flex justify="center">
               <Spinner size="xl" />

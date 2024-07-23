@@ -41,7 +41,8 @@ function UserPage() {
       </Flex>
     );
   }
-  if (!user && !loading) return <h1>User not found</h1>;
+  if (!user && !loading)
+    return <h1>The user with the username entered is not found</h1>;
   return (
     <>
       <UserHeader user={user} />

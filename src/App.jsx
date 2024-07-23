@@ -17,77 +17,82 @@ import AllGamesPage from "./pages/AllGamesPage";
 import GamePage from "./pages/GamePage";
 import UpdateGamePage from "./pages/UpdateGamePage";
 import GameOperationsPage from "./pages/GameOperationsPage";
+import { NotFound } from "./pages/NotFound";
+import ErrorBoundary from "./utils/ErrorBoundary";
 
 function App() {
   const user = useRecoilValue(userAtom);
   // const { pathname } = useLocation();
   return (
-    <Box position={"relative"} w="full">
-      <Container maxW={{ base: "620px", md: "1200px" }}>
-        <Header />
-        <Routes>
-          <Route
-            path="/"
-            element={user ? <HomePage /> : <Navigate to="/auth" />}
-          />
-          <Route
-            path="/auth"
-            element={!user ? <AuthPage /> : <Navigate to="/" />}
-          />
-          <Route
-            path="/update"
-            element={user ? <UpdateProfilePage /> : <Navigate to="/auth" />}
-          />
-          <Route
-            path="/gaming"
-            element={
-              user?.username === "ompatil" ? (
-                <GameOperationsPage />
-              ) : (
-                <Navigate to="/auth" />
-              )
-            }
-          />
+    <ErrorBoundary>
+      <Box position={"relative"} w="full">
+        <Container maxW={{ base: "620px", md: "1200px" }}>
+          <Header />
+          <Routes>
+            <Route
+              path="/"
+              element={user ? <HomePage /> : <Navigate to="/auth" />}
+            />
+            <Route
+              path="/auth"
+              element={!user ? <AuthPage /> : <Navigate to="/" />}
+            />
+            <Route
+              path="/update"
+              element={user ? <UpdateProfilePage /> : <Navigate to="/auth" />}
+            />
+            <Route
+              path="/gaming"
+              element={
+                user?.username === "ompatil" ? (
+                  <GameOperationsPage />
+                ) : (
+                  <Navigate to="/auth" />
+                )
+              }
+            />
 
-          <Route
-            path="/:username/updategame"
-            element={user ? <UpdateGamePage /> : <Navigate to="/auth" />}
-          />
-          <Route path="/forgot-password" element={<ForgotPasswordCard />} />
-          <Route path="/reset-password/:token" element={<ResetPassword />} />
+            <Route
+              path="/:username/updategame"
+              element={user ? <UpdateGamePage /> : <Navigate to="/auth" />}
+            />
+            <Route path="/forgot-password" element={<ForgotPasswordCard />} />
+            <Route path="/reset-password/:token" element={<ResetPassword />} />
 
-          <Route
-            path="/:username"
-            element={
-              user ? (
-                <>
+            <Route
+              path="/:username"
+              element={
+                user ? (
+                  <>
+                    <UserPage />
+                    <CreatePost />
+                  </>
+                ) : (
                   <UserPage />
-                  <CreatePost />
-                </>
-              ) : (
-                <UserPage />
-              )
-            }
-          />
-          <Route path="/:username/post/:pid" element={<PostPage />} />
-          <Route
-            path="/chat"
-            element={user ? <ChatPage /> : <Navigate to={"/auth"} />}
-          />
+                )
+              }
+            />
+            <Route path="/:username/post/:pid" element={<PostPage />} />
+            <Route
+              path="/chat"
+              element={user ? <ChatPage /> : <Navigate to={"/auth"} />}
+            />
 
-          <Route
-            path="/games"
-            element={user ? <AllGamesPage /> : <Navigate to={"/auth"} />}
-          />
-          <Route
-            path="/games/:game"
-            element={user ? <GamePage /> : <Navigate to={"/auth"} />}
-          />
-        </Routes>
-        {/* {user && <LogoutButton />} */}
-        {/* {user && <CreatePost />} */}
-      </Container>
-    </Box>
+            <Route
+              path="/games"
+              element={user ? <AllGamesPage /> : <Navigate to={"/auth"} />}
+            />
+            <Route
+              path="/games/:game"
+              element={user ? <GamePage /> : <Navigate to={"/auth"} />}
+            />
+            <Route path="*" element={user ? <NotFound /> : <AuthPage />} />
+          </Routes>
+          {/* {user && <LogoutButton />} */}
+          {/* {user && <CreatePost />} */}
+        </Container>
+      </Box>
+    </ErrorBoundary>
   );
 }
 
