@@ -19,6 +19,7 @@ import UpdateGamePage from "./pages/UpdateGamePage";
 import GameOperationsPage from "./pages/GameOperationsPage";
 import { NotFound } from "./pages/NotFound";
 import ErrorBoundary from "./utils/ErrorBoundary";
+import SearchPage from "./components/SearchPage";
 
 function App() {
   const user = useRecoilValue(userAtom);
@@ -37,6 +38,7 @@ function App() {
               path="/auth"
               element={!user ? <AuthPage /> : <Navigate to="/" />}
             />
+
             <Route
               path="/update"
               element={user ? <UpdateProfilePage /> : <Navigate to="/auth" />}
@@ -72,6 +74,7 @@ function App() {
                 )
               }
             />
+            <Route path="/search" Component={SearchPage} />
             <Route path="/:username/post/:pid" element={<PostPage />} />
             <Route
               path="/chat"
